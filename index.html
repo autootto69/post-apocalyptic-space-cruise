@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+<title>Post Apocalyptic Space Cruise | Where Are They? 3D Demo</title>
+
+
+	<link rel="icon" type="image/png" sizes="32x32" href="https://wherearethey.dev/files/favicon.png">
+    <meta name="description" content="Take a cruise through this procedurally generated galaxy." />
+
+    <meta property="og:title" content="Take a Space Cruise." />
+    <meta property="og:description" content="Go on a cruise in the galaxy of WHERE ARE THEY." />
+    <meta property="og:image" content="https://wherearethey.dev/cruise/og.jpg" />
+
+<style>
+:root{--fg:#dbe7ff;--dim:#8196b8;--ac:#ffb86b;--pn:rgba(6,9,20,.72);--bg:#02030a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#02030a}}
+:root[data-theme=dark]{--bg:#02030a}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 Georgia,"Iowan Old Style",serif;overflow:hidden;touch-action:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{position:fixed;left:16px;top:calc(12px + env(safe-area-inset-top,0px));pointer-events:none;text-shadow:0 1px 6px #000}
+#hud b{font-size:20px;font-weight:600;letter-spacing:.02em;display:block}
+#hud span{color:var(--dim);display:block}
+#spd{position:fixed;left:16px;bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:28px;font-variant-numeric:tabular-nums;color:var(--ac);text-shadow:0 1px 6px #000;pointer-events:none}
+#thr{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));height:42vh;width:30px;writing-mode:vertical-lr;direction:rtl;accent-color:var(--ac)}
+#warp{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(120,170,255,.35) 100%)}
+#menu{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;background:rgba(2,3,10,.82)}
+#menu h1{font-size:clamp(40px,9vw,84px);font-weight:400;margin:0;letter-spacing:.04em}
+#menu p{max-width:46ch;margin:0;color:var(--dim)}
+#menu.hide{display:none}
+button{font:inherit;color:var(--fg);background:var(--pn);border:1px solid var(--dim);border-radius:3px;padding:8px 18px;cursor:pointer}
+button:hover,button:focus-visible{border-color:var(--ac);outline:none}
+button.on{border-color:var(--ac);color:var(--ac)}
+#go{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:110px;
+  height:110px;
+  flex-shrink: 0;
+  min-width:0;
+  padding:0;
+  box-sizing:border-box;
+  font-size:26px;
+  line-height:1;
+  text-align:center;
+  white-space:nowrap;
+  border:2px solid #ef4444;
+  border-radius:50%;
+  background:#ef4444;
+  color:#fff;
+  cursor:pointer;
+}
+:root{--retro-bg:#050505;--retro-panel:#0a0a0a;--retro-border:#14532d;--retro-text:#4ade80;--retro-text-dim:#9ca3af;--retro-accent:#22c55e;--fg:#4ade80;--dim:#9ca3af;--ac:#22c55e;--pn:#0a0a0a}
+html,body{font-family:'VT323',monospace;font-size:22px;line-height:1.15;color:var(--retro-text);background:#050505}
+#hud b{font-weight:400;font-size:30px;text-shadow:0 0 8px rgba(51,255,51,.5)}
+#spd{font-size:40px;text-shadow:0 0 10px rgba(51,255,51,.5)}
+#warp{background:radial-gradient(ellipse at center,transparent 45%,rgba(74,222,128,.3) 100%)}
+#menu{background-color:rgba(8,17,8,.92);background-image:linear-gradient(rgba(20,50,20,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(20,50,20,.1) 1px,transparent 1px);background-size:3px 3px;box-shadow:inset 0 0 100px rgba(0,0,0,.9);overflow:auto}
+#menu h1{font-size:clamp(56px,12vw,96px);font-weight:400;text-shadow:0 0 10px rgba(51,255,51,.5)}
+#menu p{color:var(--retro-text-dim);font-size:18px}
+#trail{max-width:min(45vw,260px);max-height:15vh;image-rendering:pixelated;border:2px solid var(--retro-border)}
+button{font-family:inherit;font-size:26px;border:2px solid var(--retro-border);border-radius:0;color:var(--retro-text);background:var(--retro-panel);transition:.2s}
+button:hover,button:focus-visible{border-color:var(--retro-accent);transform:scale(1.05)}
+button.on{border-color:var(--retro-accent);color:var(--retro-accent)}
+#gear{position:fixed;right:66px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;align-items:center;font-size:26px;color:var(--retro-accent)}
+#gear button{padding:2px 12px}
+.scanline{position:fixed;top:0;left:0;width:100%;height:100vh;background:linear-gradient(0deg,transparent 0%,rgba(51,255,51,.03) 50%,transparent 100%);animation:sl 10s linear infinite;pointer-events:none}
+@keyframes sl{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@media (prefers-reduced-motion:reduce){.scanline{animation:none}}
+</style></head>
+
+<body>
+<canvas id="c"></canvas><div id="warp"></div>
+<div id="hud"><b id="sys"></b><span id="near"></span><span id="info" style="white-space:pre;color:var(--retro-text);font-size:24px;margin-top:6px"></span></div>
+<div id="spd"></div>
+<input id="thr" type="range" min="0" max="100" value="70" aria-label="Throttle">
+<div id="gear"><button id="gm" aria-label="Slower">-</button><span id="gv">×1.0</span><button id="gp" aria-label="Faster">+</button></div>
+<div class="scanline"></div>
+<div id="menu"><a href="https://wherearethey.dev/" title="Take me to base"><img id="trail" src="https://wherearethey.dev/files/the-trail.gif" alt="The trail" onerror="this.remove()" style="border:none;""></a><h1>Post Apocalyptic Space Cruise</h1>
+<p>Cruise between star systems and discover gas giants, rocky worlds, moons, and otherworldly surprises.
+Gravity affects your ship's speed: you'll automatically slow down when approaching celestial bodies and speed up again when travelling between stars.<br><br>
+<b>Fun fact</b>: This entire galaxy is generated in your browser by a single 28 KB HTML file!</p>
+Controls:
+<p>Mouse or drag to steer · W/S throttle · +/- or wheel: speed gear · Q/E roll · M mute · ESC quit</p>
+<div id="q"><button data-q="0">Low</button> <button data-q="1" class="on">Medium</button> <button data-q="2">High</button></div>
+<button id="go">Launch</button>
+
+<style>
+/* FOOTER - standalone styling for the cruise demo */
+#menu .footer {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.6rem;
+    flex-shrink: 0;
+}
+
+#menu .footer a {
+    display: inline-block;
+    margin: 0 1rem;
+    color: var(--retro-text-dim);
+    text-decoration: none;
+}
+
+#menu .footer a:hover {
+    color: var(--retro-accent);
+}
+
+#menu .footer .copyright {
+    margin-top: 1rem;
+    color: var(--retro-text-dim);
+}
+</style>
+
+<footer class="footer" style="border-top:none;">
+    <div>
+        <a href="https://wherearethey.dev/">Home</a>
+        <a href="https://wherearethey.dev/about.html">About</a>
+        <a href="https://wherearethey.dev/imprint.html">Imprint</a>
+        <a href="https://wherearethey.dev/terms.html">Terms</a>
+        <a href="https://wherearethey.dev/privacy.html">Privacy</a>
+        <a href="mailto:bugs@wherearethey.dev">Report a Bug</a>
+    </div>
+    <div class="copyright">
+        © ConanTheLibrarian 2026
+    </div>
+</footer>
+
+</div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),cv=$('c'),gl=cv.getContext('webgl2',{antialias:false,alpha:false});
+if(!gl)document.body.innerHTML='<p style="padding:2em">This page needs WebGL2.</p>';
+const NOISE=`uniform float uQ;
+float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
+return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
+mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.,w=0.;for(int i=0;i<6;i++){if(float(i)>=uQ)break;s+=a*vn(p);w+=a;p=p*2.03+1.7;a*=.5;}return s/w;}`;
+function prog(vs,fs){const p=gl.createProgram();
+ for(const[t,s]of[[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){const h=gl.createShader(t);gl.shaderSource(h,'#version 300 es\nprecision highp float;\n'+s);gl.compileShader(h);
+  if(!gl.getShaderParameter(h,gl.COMPILE_STATUS))console.error(gl.getShaderInfoLog(h));gl.attachShader(p,h)}
+ gl.bindAttribLocation(p,0,'aQ');gl.bindAttribLocation(p,0,'aP');gl.bindAttribLocation(p,1,'aC');gl.linkProgram(p);
+ const c={};p.u=n=>c[n]??=gl.getUniformLocation(p,n);return p}
+const QV=`in vec2 aQ;out vec2 vq;void main(){vq=aQ;gl_Position=vec4(aQ,0.,1.);}`;
+const NF=NOISE+`in vec2 vq;out vec4 o;uniform vec3 uRt,uUp,uBk;uniform float uF,uA;
+void main(){vec3 d=normalize(vec3(vq.x*uA/uF,vq.y/uF,-1.));vec3 w=uRt*d.x+uUp*d.y+uBk*d.z;
+float band=exp(-pow(dot(w,normalize(vec3(.3,1.,.2)))*3.4,2.));
+float n=fbm(w*2.2+3.),m=fbm(w*5.+n*2.);
+vec3 c=band*(vec3(.2,.17,.32)*n*1.7+vec3(.55,.3,.2)*pow(m,3.)*.6)+vec3(.3,.08,.25)*pow(fbm(w*1.3+9.),4.)*.5;
+o=vec4(c*.55,1.);}`;
+const PV=`in vec3 aP;in vec4 aC;uniform vec3 uCam,uRt,uUp,uBk;uniform float uF,uA,uH,uBg;out vec3 vc;
+void main(){vec3 d=uBg>.5?aP:aP-uCam;vec3 v=vec3(dot(d,uRt),dot(d,uUp),dot(d,uBk));
+gl_Position=vec4(v.x*uF/uA,v.y*uF,0.,-v.z);
+if(uBg>.5){gl_PointSize=max(1.2,aC.a*uH/900.);vc=aC.rgb;}
+else{float dist=length(d);gl_PointSize=(2.+3.*aC.a)*uH/900.;vc=aC.rgb*(.45+.55*clamp(250000./dist,0.,1.));}}`;
+const PF=`in vec3 vc;out vec4 o;void main(){float r=length(gl_PointCoord-.5)*2.;float a=1.-smoothstep(0.,1.,r);o=vec4(vc*a*a,1.);}`;
+const BV=`in vec2 aQ;uniform vec3 uC;uniform float uS,uF,uA;out vec3 vP;out vec2 vQ;
+void main(){vQ=aQ;vP=uC+vec3(aQ*uS,0.);gl_Position=vec4(vP.x*uF/uA,vP.y*uF,0.,-vP.z);}`;
+const BF=NOISE+`in vec3 vP;in vec2 vQ;out vec4 o;
+uniform vec3 uC,uL,uLC,uCA,uCB,uCC,uAtm,uRN,uRt,uUp,uBk;uniform vec2 uRing;uniform float uR,uK,uSeed,uT,uTilt;
+void main(){
+ vec3 d=normalize(vP);float b=dot(d,uC),disc=b*b-dot(uC,uC)+uR*uR;
+ bool hs=disc>0.&&b>0.;float t=hs?b-sqrt(disc):0.;
+ vec4 res=vec4(0.);vec3 n=normalize(d*t-uC);
+ if(hs){
+  vec3 q=uRt*n.x+uUp*n.y+uBk*n.z;float ca=cos(uTilt),sa=sin(uTilt);
+  q=vec3(ca*q.x-sa*q.y,sa*q.x+ca*q.y,q.z);
+  float sp=uT*.02+uSeed,cs=cos(sp),sn=sin(sp);q.xz=vec2(cs*q.x-sn*q.z,sn*q.x+cs*q.z);
+  float lat=q.y,h=fbm(q*2.5+uSeed*7.);vec3 col,em=vec3(0.),sh;float spec=0.;
+  if(uK>5.5){float gr=fbm(q*5.+uT*.02);float limb=pow(max(dot(n,-d),0.),.5);sh=uK>6.5?vec3(0.):uLC*(.7+.5*gr)*(.5+.6*limb)*1.3;}
+  else{
+   if(uK<.5){float land=smoothstep(.5,.52,h);
+    col=mix(mix(uCA*.4,uCA,smoothstep(.3,.5,h)),mix(uCB,uCC,smoothstep(.52,.75,h)),land);
+    col=mix(col,vec3(.93,.96,1.),smoothstep(.62,.85,abs(lat)+(h-.5)*.4));
+    float cl=fbm(q*3.5+uSeed*3.+vec3(uT*.01,0.,0.));float cm=smoothstep(.52,.72,cl);
+    col=mix(col,vec3(1.),cm*.85);spec=(1.-land)*(1.-cm);}
+   else if(uK<1.5){float cr=fbm(q*9.);col=mix(uCA,uCB,h)*(.65+.7*cr);}
+   else if(uK<2.5){float st=fbm(vec3(q.x*1.5,q.y*7.,q.z*1.5)+uSeed);col=mix(uCA,uCB,mix(h,st,.5));}
+   else if(uK<3.5){float r=abs(fbm(q*4.+uSeed)-.5);col=uCA*(.6+h);em=uCC*smoothstep(.07,0.,r)*1.6;}
+   else{float w=fbm(q*3.+uSeed*5.);float bnd=.5+.5*sin(lat*(8.+mod(uSeed*13.,7.))+w*3.5);
+    col=mix(uCA,uCB,bnd);col=mix(col,uCC,smoothstep(.55,.85,fbm(vec3(q.x*2.,q.y*12.,q.z*2.)+w*2.))*.7);}
+   float nl=dot(n,uL);float dif=smoothstep(-.05,.4,nl);
+   sh=col*(uLC*dif+.012);
+   sh+=uLC*pow(max(dot(n,normalize(uL-d)),0.),60.)*spec*.6*dif;
+   sh+=uAtm*pow(1.-max(dot(n,-d),0.),3.)*smoothstep(-.4,.5,nl)*1.2+em;}
+  res=vec4(sh,1.);}
+ if(uRing.y>0.){float tr=dot(uC,uRN)/dot(d,uRN);
+  if(tr>0.&&(!hs||tr<t)){vec3 Q=d*tr;float rr=length(Q-uC)/uR;
+   if(rr>uRing.x&&rr<uRing.y){float u=(rr-uRing.x)/(uRing.y-uRing.x);
+    float bd=.5+.5*sin(u*70.+sin(u*17.)*3.);bd=bd*.7+.3*vn(vec3(u*40.,uSeed,0.));
+    float al=bd*smoothstep(0.,.05,u)*smoothstep(1.,.9,u)*(1.-.6*step(.45,u)*step(u,.5))*.85;
+    vec3 oc=Q-uC;float bq=dot(oc,uL),cq=dot(oc,oc)-uR*uR;float shd=(bq<0.&&bq*bq-cq>0.)?.12:1.;
+    res=vec4(mix(uCA,uCC,bd)*uLC*shd*.9*al,al)+res*(1.-al);}}}
+ if(!hs&&b>0.){vec3 pc=d*b-uC;float dm=length(pc);
+  if(uK>5.5){float x=uR/max(dm,uR);float cor=pow(x,2.4)*.9+pow(x,8.)*.8;if(uK>6.5){float dd=length(vec2(pc.x,pc.y*3.))/uR;cor=pow(x,10.)*1.2+exp(-pow((dd-2.2)*2.2,2.))*1.6*smoothstep(1.,1.6,dd);}
+   cor*=1.+.25*pow(abs(sin(atan(pc.y,pc.x)*3.+uT*.1+uSeed)),8.);cor*=1.-smoothstep(.7,1.,length(vQ));res.rgb+=uLC*cor;}
+  else{float e=(dm-uR)/(uR*.12);if(e>0.&&e<1.){float g=pow(1.-e,2.5)*smoothstep(-.4,.6,dot(normalize(pc),uL));res.rgb+=uAtm*g*.8;res.a+=g*.2;}}}
+ o=res;}`;
+const bodyP=prog(BV,BF),ptsP=prog(PV,PF),bgP=prog(QV,NF);
+
+/* ---------- procedural galaxy ---------- */
+let seed=1337;const rnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const R=(a,b)=>a+(b-a)*rnd(),pick=a=>a[rnd()*a.length|0];
+const syl=['ka','zu','ri','vo','le','an','thor','mi','sa','ex','dra','ul','ne','ox','ys','ta'];
+const nm=()=>{let s='';for(let i=R(2,4)|0;i>0;i--)s+=pick(syl);return s[0].toUpperCase()+s.slice(1)};
+const hsv=(h,s,v)=>{const f=n=>{const k=(n+h*6)%6;return v-v*s*Math.max(0,Math.min(k,4-k,1))};return[f(5),f(3),f(1)]};
+const SC=[[1,.55,.3],[1,.75,.45],[1,.92,.75],[.85,.92,1],[.65,.78,1]];
+const LAB=['Ocean world','Barren world','Desert world','Lava world','Gas giant'];
+function world(k,r,name,T){const w={k,r,name,seed:R(0,10),tilt:R(-.5,.5),a:R(0,6.28),inc:R(-.08,.08),ring:null,moons:[],atm:[0,0,0]};
+ if(k==0){w.ca=hsv(R(.52,.62),.9,.55);w.cb=hsv(R(.2,.35),.6,.4);w.cc=hsv(R(.08,.13),.4,.5);w.atm=[.35,.55,1]}
+ else if(k==1){const ice=T<160;w.ca=ice?[.8,.88,.95]:hsv(R(0,.12),.2,.55);w.cb=ice?[.5,.6,.75]:hsv(R(0,.12),.25,.3);w.cc=w.ca;w.ice=ice}
+ else if(k==2){w.ca=hsv(R(.04,.12),.6,.85);w.cb=hsv(R(.02,.09),.7,.5);w.cc=w.ca;w.atm=[.45,.27,.15]}
+ else if(k==3){w.ca=[.1,.06,.05];w.cb=w.ca;w.cc=[1,.35,.05];w.atm=[.7,.2,.05]}
+ else{const h=T>900?pick([0,.04,.08]):(T<70||r<130)?pick([.5,.55,.6]):pick([.08,.1,.12,.02,.75])+R(-.03,.03);w.ca=hsv(h,.45,.85);w.cb=hsv(h+.03,.5,.5);w.cc=hsv(h+.08,.25,.95);w.atm=hsv(h,.5,.55);
+  if(rnd()<(r>130?.45:.12))w.ring=[1.4,R(2,2.7)]}
+ w.label=k==1?(w.ice?'Ice world':'Barren world'):LAB[k];return w}
+/* star classes: share of stars, radius, colour, habitable-zone distance (hz), planet count, giant-planet odds (gp) */
+const CL={
+ M:{p:.75,l:'Red dwarf',r:[110,190],c:()=>[1,R(.4,.6),R(.2,.35)],hz:700,n:()=>1+(R(0,1)**1.5*6|0),gp:.25},
+ G:{p:.07,l:'Sun-like star',r:[300,420],c:()=>pick([[1,.92,.75],[1,.85,.6],[1,.97,.9]]),hz:1700,n:()=>2+(R(0,11)|0),gp:1},
+ W:{p:.035,l:'White dwarf',r:[55,75],c:()=>[.8,.9,1],hz:350,n:()=>1+(R(0,3)|0),gp:.3},
+ N:{p:.065,l:'Neutron star',r:[35,45],c:()=>[.6,.75,1],hz:300,n:()=>1+(R(0,3)|0),gp:0},
+ X:{p:.04,l:'Supergiant',r:[1100,1800],c:()=>pick([[1,.4,.2],[.6,.75,1]]),hz:9000,n:()=>1+(R(0,6)|0),gp:1},
+ B:{p:.04,l:'Black hole',r:[110,150],c:()=>[1,.6,.25],hz:1500,n:()=>1+(R(0,4)|0),gp:.5}};
+const pickCl=()=>{let x=rnd();for(const k in CL){if((x-=CL[k].p)<0)return k}return'M'};
+const MS={M:[.08,.5],G:[.7,1.4],W:[.5,.7],N:[1.2,2.1],X:[10,40],B:[3,30]},RF={M:3,G:1,W:.5,N:60,X:20,B:30};
+const mkStar=t=>{const c=CL[t],col=c.c();return{t,k:t=='B'?7:6,r:R(...c.r),c:col,l:c.l,hz:c.hz,m:R(...MS[t]),sp:t=='M'?'M'+(R(0,9)|0)+'V':t=='G'?pick(['F','G','G','K'])+(R(0,9)|0)+'V':t=='W'?'DA':t=='N'?'Pulsar':t=='X'?(col[0]>.9?'M2 Ia':'B1 Ia'):'Stellar-mass'}};
+/* inspection data: gravity, temperature, water coverage, radiation */
+function props(w,base,sh){const g=w.k==4?(w.r>130?1.2+(w.r-140)/120*1.5:.8+(w.r-80)/45*.4):Math.pow(w.r/30,1.5);
+ const wv=w.k==0?R(.45,.95):w.k==1&&w.ice?R(.15,.8):w.k==2?R(0,.03):0,rv=base*sh;
+ w.info=[`Gravity: ${g.toFixed(2)} g`,`Temperature: ${w.T} K (${w.T-273} °C)`,`Water coverage: ${w.k==4?'n/a (no surface)':wv<.005?'none':Math.round(wv*100)+'%'+(w.k==1?' (frozen)':'')}`,`Radiation: ${rv<.5?'Low':rv<2?'Moderate':rv<10?'High':rv<50?'Very high':'Extreme'} (×${rv<10?rv.toFixed(1):Math.round(rv)} Earth)`]}
+/* planet: size class from distance to star (x = orbit/hz), temperature T = 280/x kelvin decides the surface */
+function planet(st,o,f,name){
+ const x=o/st.hz,T=280/x,gp=CL[st.t].gp,u=rnd();
+ const big=x>2.2?.4*gp:x<.8?.05*gp:.01*gp,mid=gp?(x>2.2?.25:.12):0;
+ const cls=u<big?'g':u<big+mid?'n':rnd()<.5?'t':'s';
+ let r=cls=='g'?R(140,260):cls=='n'?R(80,125):cls=='t'?R(22,45):R(45,75);
+ let k=(cls=='g'||cls=='n')?4:T>800?3:T>450?pick([2,2,1]):T>340?pick([2,1]):T>=240?(r<28?1:pick([0,0,0,2])):T>=170?pick([2,1]):1;
+ if(f>=0){k=f;r=f==4?R(150,240):R(30,45)}
+ const w=world(k,r,name,T);w.T=Math.round(T);const base=RF[st.t]/(x*x);props(w,base,k==0?.25:k==2?.5:1);
+ w.label=k==4?(r<130?(T<70?'Ice giant':'Mini-Neptune'):(T>900?'Hot Jupiter':'Gas giant')):(r>45?w.label.replace('world','super-earth'):w.label);
+ let mo=w.ring?w.r*w.ring[1]*1.3:w.r*2.5;
+ for(let m=k==4?(r>130?R(0,5)|0:R(0,3)|0):(rnd()<(r>45?.15:.3)?R(1,3)|0:0);m>0;m--){
+  const mm=world(k==4&&T<900&&rnd()<.15?3:1,Math.min(40,Math.max(8,w.r*R(.08,.25))),name+' '+(w.moons.length+1),T);
+  mm.o=mo*=R(1.3,1.9);mm.w=R(.6,1)*.35/Math.pow(mm.o/w.r,1.5);mm.tilt=0;mm.T=w.T;props(mm,base*(k==4?3:1),1);mm.label=mm.k==3?'Lava moon':mm.ice?'Ice moon':'Moon';w.moons.push(mm)}
+ return w}
+const S=[];
+for(let i=0;i<700;i++){
+ const st=mkStar(i?pickCl():'G'),s={p:i?[R(-1,1)*8e5,R(-.3,.3)*8e5,R(-1,1)*8e5]:[0,0,0],r:st.r,c:st.c,k:st.k,l:st.l,m:st.m,sp:st.sp,name:nm(),pl:[],cs:[],lc:st.t=='B'?st.c.map(v=>v*.2):st.t=='W'?st.c.map(v=>v*.5):st.c};
+ let ext=0;
+ if(rnd()<.5)for(let sep=R(5000,12000),m=rnd()<.12?2:1;m>0;m--){const cc=mkStar(pickCl());cc.sep=sep*=R(1,1.6);cc.w=R(.5,1)*20/cc.sep;cc.a=R(0,6.28);s.cs.push(cc);ext=Math.max(ext,cc.sep)}
+ let o=st.r*1.4+R(30,200),n=i?CL[st.t].n():7;const sp=Math.max(1,st.r/400);
+ for(let j=0;j<n;j++){
+  const w=planet(st,o,i?-1:j==1?0:j==3?4:-1,s.name+' '+'bcdefghijklm'[j]);w.o=o;w.w=R(.5,1)*30/o;
+  s.pl.push(w);ext=Math.max(ext,o+(w.moons.length?w.moons[w.moons.length-1].o:0));o+=(R(250,650)+w.r*3)*sp}
+ s.ext=ext+2500;S.push(s)}
+const NB=2500,NS=S.length,buf=new Float32Array((NB+NS)*7);
+for(let i=0;i<NB;i++){let x,y,z,l;do{x=R(-1,1);y=R(-1,1);z=R(-1,1);l=Math.hypot(x,y,z)}while(l>1||l<.1);
+ const b=R(.25,1)**2,t=R(.8,1);buf.set([x/l,y/l,z/l,b*t,b*.9,b,R(1,2.2)],i*7)}
+S.forEach((s,i)=>buf.set([...s.p,...(s.k==7?s.c.map(v=>v*.3):s.c),R(0,1)],(NB+i)*7));
+const qv=gl.createVertexArray();gl.bindVertexArray(qv);
+gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+const pv=gl.createVertexArray();gl.bindVertexArray(pv);
+gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,buf,gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,28,0);
+gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,4,gl.FLOAT,false,28,12);
+const dots=new Float32Array(256*7),dv=gl.createVertexArray(),db=gl.createBuffer();gl.bindVertexArray(dv);gl.bindBuffer(gl.ARRAY_BUFFER,db);gl.bufferData(gl.ARRAY_BUFFER,dots,gl.DYNAMIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,28,0);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,4,gl.FLOAT,false,28,12);
+
+/* ---------- ship ---------- */
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],len=a=>Math.hypot(a[0],a[1],a[2]),
+ nrm=a=>{const l=len(a)||1;return[a[0]/l,a[1]/l,a[2]/l]},sc=(a,k)=>[a[0]*k,a[1]*k,a[2]*k],
+ cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+let cam=[0,700,6500],rt=[1,0,0],up=[0,1,0],bk=[0,0,1],thr=.7,gear=1,spd=0,T=0,Q=1,mx=0,my=0,started=false,muted=false;
+function rot2(a,b,g){const c=Math.cos(g),s=Math.sin(g);return[[a[0]*c+b[0]*s,a[1]*c+b[1]*s,a[2]*c+b[2]*s],[b[0]*c-a[0]*s,b[1]*c-a[1]*s,b[2]*c-a[2]*s]]}
+const keys={};addEventListener('keydown',e=>{keys[e.code]=1;if(e.code=='KeyM'){muted=!muted;au&&(muted?au.suspend():au.resume())}});addEventListener('keyup',e=>keys[e.code]=0);
+let drag=false,lx=0,ly=0;
+cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY});
+addEventListener('pointerup',()=>drag=false);
+addEventListener('pointermove',e=>{if(document.pointerLockElement){mx+=e.movementX;my+=e.movementY}else if(drag){mx+=(e.clientX-lx)*1.3;my+=(e.clientY-ly)*1.3}lx=e.clientX;ly=e.clientY});
+$('thr').oninput=e=>thr=e.target.value/100;
+const setG=g=>{gear=Math.max(.1,Math.min(5,g));$('gv').textContent='×'+(gear<1?gear.toFixed(2):gear.toFixed(1))};
+$('gm').onclick=()=>setG(gear/1.5);$('gp').onclick=()=>setG(gear*1.5);
+addEventListener('wheel',e=>setG(gear*(e.deltaY<0?1.15:1/1.15)),{passive:true});
+addEventListener('keydown',e=>{if(e.code=='Equal'||e.code=='NumpadAdd')setG(gear*1.5);if(e.code=='Minus'||e.code=='NumpadSubtract')setG(gear/1.5)});
+document.querySelectorAll('#q button').forEach(b=>b.onclick=()=>{Q=+b.dataset.q;document.querySelectorAll('#q button').forEach(x=>x.classList.toggle('on',x==b));resize()});
+function resize(){const d=Math.min(devicePixelRatio||1,2)*[.55,.8,1][Q];cv.width=innerWidth*d|0;cv.height=innerHeight*d|0;gl.viewport(0,0,cv.width,cv.height)}
+addEventListener('resize',resize);resize();
+$('go').onclick=()=>{$('menu').classList.add('hide');started=true;cv.requestPointerLock?.();audio()};
+document.addEventListener('pointerlockchange',()=>{if(started&&!document.pointerLockElement){$('go').textContent='Resume';$('menu').classList.remove('hide')}});
+let au,eg,ebp;
+function audio(){if(au)return au.resume();au=new AudioContext();
+ const mk=(t,f)=>{const o=au.createOscillator();o.type=t;o.frequency.value=f;o.start();return o};
+ const g=au.createGain();g.gain.value=.05;const lp=au.createBiquadFilter();lp.type='lowpass';lp.frequency.value=220;
+ [mk('sawtooth',55),mk('sawtooth',55.3),mk('sine',110.5)].forEach(o=>o.connect(lp));lp.connect(g);g.connect(au.destination);
+ const nb=au.createBuffer(1,au.sampleRate*2,au.sampleRate),d=nb.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+ const ns=au.createBufferSource();ns.buffer=nb;ns.loop=true;ebp=au.createBiquadFilter();ebp.type='lowpass';eg=au.createGain();eg.gain.value=0;
+ ns.connect(ebp);ebp.connect(eg);eg.connect(au.destination);ns.start()}
+const fmt=n=>Math.round(n).toLocaleString('en');
+const fmtD=d=>d>3e4?(d/32500).toFixed(2)+' ly':fmt(d*1000)+' km';
+const orb=(p,o,w,a,inc)=>{const t=a+T*w;return[p[0]+Math.cos(t)*o,p[1]+Math.sin(t)*o*inc,p[2]+Math.sin(t)*o]};
+let last=performance.now(),fr=0;
+
+function frame(now){
+ const dt=Math.min((now-last)/1000,.1);last=now;T+=dt;
+ if(started&&!$('menu').classList.contains('hide')===false){}
+ if(keys.KeyW)thr=Math.min(1,thr+dt*.6);if(keys.KeyS)thr=Math.max(0,thr-dt*.6);
+ if(keys.KeyW||keys.KeyS)$('thr').value=thr*100;
+ let r;
+ r=rot2(rt,bk,mx*.0022);rt=r[0];bk=r[1];r=rot2(up,bk,-my*.0022);up=r[0];bk=r[1];mx=my=0;
+ if(keys.KeyQ||keys.KeyE){r=rot2(rt,up,(keys.KeyQ?1:-1)*dt*1.2);rt=r[0];up=r[1]}
+ rt=nrm(rt);up=nrm(sub(up,sc(rt,dot(up,rt))));bk=cross(rt,up);
+ /* bodies near the ship */
+ const list=[];let near=1e12,nearSys=null,nearSysD=1e12,nb=null,nd=1e12;
+ for(const s of S){const d=len(sub(s.p,cam)),ds=d-s.r;if(ds<nearSysD){nearSysD=ds;nearSys=s}
+  if(d>150000)continue;
+  list.push({p:s.p,r:s.r,k:s.k,seed:s.p[0]%7,tilt:0,star:s,name:s.name,label:s.l,mass:s.m,spec:s.sp,np:s.pl.length,ca:s.c,cb:s.c,cc:s.c,atm:[0,0,0]});
+  s.cs.forEach((c,ci)=>{const cp=orb(s.p,c.sep,c.w,c.a,.05);list.push({p:cp,r:c.r,k:c.k,seed:ci+3,tilt:0,star:{p:cp,c:c.c},name:s.name+' '+'BC'[ci],label:c.l,mass:c.m,spec:c.sp,ca:c.c,cb:c.c,cc:c.c,atm:[0,0,0]})});
+  if(d<s.ext)for(const w of s.pl){const wp=orb(s.p,w.o,w.w,w.a,w.inc);list.push(Object.assign({p:wp,star:s},w));
+   for(const m of w.moons)list.push(Object.assign({p:orb(wp,m.o,m.w,m.a,m.inc),star:s},m))}}
+ for(const b of list){const d=len(sub(b.p,cam));b.d=d;const g=d-b.r;if(g<nd){nd=g;nb=b}}
+ near=Math.min(nd,nearSysD);
+ /* speed: fast in deep space, slows near any body */
+ const tgt=thr*gear*Math.max(4,Math.min(1e6,near*.75));
+ spd+=(tgt-spd)*Math.min(1,dt*3);
+ const fwd=sc(bk,-1);cam=[cam[0]+fwd[0]*spd*dt,cam[1]+fwd[1]*spd*dt,cam[2]+fwd[2]*spd*dt];
+ for(const b of list){const rel=sub(cam,b.p),d=len(rel),m=b.r*(b.k>5?1.5:1.12)+2;if(d<m){cam=[b.p[0]+rel[0]/d*m,b.p[1]+rel[1]/d*m,b.p[2]+rel[2]/d*m]}}
+ /* draw */
+ const fov=(62+24*Math.min(1,spd/40000))*Math.PI/180,F=1/Math.tan(fov/2),A=cv.width/cv.height,qs=[3,4,5][Q];
+ gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT);
+ const v3=(p,n,a)=>gl.uniform3f(p.u(n),a[0],a[1],a[2]);
+ gl.useProgram(bgP);v3(bgP,'uRt',rt);v3(bgP,'uUp',up);v3(bgP,'uBk',bk);gl.uniform1f(bgP.u('uF'),F);gl.uniform1f(bgP.u('uA'),A);gl.uniform1f(bgP.u('uQ'),Math.min(qs,4));
+ gl.bindVertexArray(qv);gl.disable(gl.BLEND);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+ gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);
+ gl.useProgram(ptsP);v3(ptsP,'uCam',cam);v3(ptsP,'uRt',rt);v3(ptsP,'uUp',up);v3(ptsP,'uBk',bk);
+ gl.uniform1f(ptsP.u('uF'),F);gl.uniform1f(ptsP.u('uA'),A);gl.uniform1f(ptsP.u('uH'),cv.height);
+ gl.bindVertexArray(pv);gl.uniform1f(ptsP.u('uBg'),1);gl.drawArrays(gl.POINTS,0,NB);gl.uniform1f(ptsP.u('uBg'),0);gl.drawArrays(gl.POINTS,NB,NS);
+ {let n=0;for(const b of list){if(b.k>5||n>=250||b.r/b.d*F*cv.height/2>3)continue;const c=b.ca;dots.set([b.p[0],b.p[1],b.p[2],c[0]*.9+.1,c[1]*.9+.1,c[2]*.9+.1,.5],n++*7)}
+  if(n){gl.bindVertexArray(dv);gl.bindBuffer(gl.ARRAY_BUFFER,db);gl.bufferSubData(gl.ARRAY_BUFFER,0,dots,0,n*7);gl.drawArrays(gl.POINTS,0,n)}}
+ gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);gl.useProgram(bodyP);gl.bindVertexArray(qv);
+ v3(bodyP,'uRt',rt);v3(bodyP,'uUp',up);v3(bodyP,'uBk',bk);
+ gl.uniform1f(bodyP.u('uF'),F);gl.uniform1f(bodyP.u('uA'),A);gl.uniform1f(bodyP.u('uQ'),qs);gl.uniform1f(bodyP.u('uT'),T);
+ list.sort((a,b)=>b.d-a.d);
+ const tv=a=>[dot(a,rt),dot(a,up),dot(a,bk)];
+ for(const b of list){
+  const rel=sub(b.p,cam),c=tv(rel),z=-c[2];if(z<1||b.d<=b.r)continue;
+  let s=b.r*1.25*b.d/Math.sqrt(Math.max(b.d*b.d-b.r*b.r,.01*b.r*b.r));
+  if(b.k>5)s=Math.max(s,b.r*10);
+  if(b.ring)s=Math.max(s,b.r*b.ring[1]*1.15*z/Math.max(z-b.r*b.ring[1],z*.3));
+  const lim=z/F;if(Math.abs(c[1])-s>lim||Math.abs(c[0])-s>lim*A)continue;
+  const L=tv(nrm(sub(b.star.p,b.p))),ta=b.tilt,rn=tv([Math.sin(ta),Math.cos(ta),0]);
+  v3(bodyP,'uC',c);gl.uniform1f(bodyP.u('uS'),s);gl.uniform1f(bodyP.u('uR'),b.r);gl.uniform1f(bodyP.u('uK'),b.k);gl.uniform1f(bodyP.u('uSeed'),b.seed);gl.uniform1f(bodyP.u('uTilt'),ta);
+  v3(bodyP,'uL',L);v3(bodyP,'uLC',b.k>5?b.star.c:b.star.lc||b.star.c);v3(bodyP,'uCA',b.ca);v3(bodyP,'uCB',b.cb);v3(bodyP,'uCC',b.cc);v3(bodyP,'uAtm',b.atm);v3(bodyP,'uRN',rn);
+  gl.uniform2f(bodyP.u('uRing'),b.ring?b.ring[0]:0,b.ring?b.ring[1]:0);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4)}
+ /* hud + audio */
+ if(!(fr++%5)){$('sys').textContent=nearSys.name+' system';
+  const ib=nd<7000&&nb;$('near').textContent=ib?`${nb.name}: ${nb.label}, ${fmtD(nd)}`:`Interstellar space, ${fmtD(nearSysD)} to the nearest star`;
+  $('info').textContent=ib&&nd<Math.max(900,nb.r*8)?(nb.k>5?[`Type: ${nb.label} (${nb.spec})`,`Mass: ${nb.mass.toFixed(2)} M☉`].concat(nb.np!=null?['Planets: '+nb.np]:[]):nb.info.concat(/moon$/i.test(nb.label)?[]:['Moons: '+nb.moons.length])).join('\n'):'';
+  $('spd').textContent=spd<5000?fmt(spd*1000)+' km/s':(spd/32500).toFixed(2)+' ly/s'}
+ $('warp').style.opacity=Math.min(1,spd/60000);
+ if(eg){eg.gain.value=Math.min(.18,spd/150000);ebp.frequency.value=300+Math.min(spd/40,2500)}
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script>
+
+</body></html>
